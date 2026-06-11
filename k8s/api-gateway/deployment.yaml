@@ -2,28 +2,30 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: frontend
+  name: api-gateway
 
 spec:
   replicas: 2
 
   selector:
     matchLabels:
-      app: frontend
+      app: api-gateway
 
   template:
     metadata:
       labels:
-        app: frontend
+        app: api-gateway
 
     spec:
       containers:
-      - name: frontend
-        image: react-frontend:v2
+      - name: api-gateway
+
+        image: api-gateway:v1
+
         imagePullPolicy: Never
 
         ports:
-        - containerPort: 80
+        - containerPort: 3000
 
         resources:
           requests:
