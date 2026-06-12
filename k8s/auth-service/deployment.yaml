@@ -20,12 +20,19 @@ spec:
       containers:
       - name: auth-service
 
-        image: auth-service:v1
+        image: auth-service:v2
 
         imagePullPolicy: Never
 
         ports:
         - containerPort: 8000
+
+        envFrom:
+        - configMapRef:
+            name: auth-config
+
+        - secretRef:
+            name: auth-secret
 
         resources:
           requests:
