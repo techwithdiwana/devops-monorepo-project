@@ -20,7 +20,7 @@ spec:
       containers:
       - name: api-gateway
 
-        image: api-gateway:v2
+        image: api-gateway:v3
 
         imagePullPolicy: Never
 
