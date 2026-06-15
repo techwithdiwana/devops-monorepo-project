@@ -1,0 +1,35 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+
+metadata:
+  name: jenkins-agent-role
+
+rules:
+- apiGroups: [""]
+  resources:
+    - pods
+    - services
+    - configmaps
+    - secrets
+    - namespaces
+  verbs:
+    - get
+    - list
+    - watch
+
+- apiGroups: ["apps"]
+  resources:
+    - deployments
+    - statefulsets
+  verbs:
+    - get
+    - list
+    - watch
+    - patch
+    - update
+
+- apiGroups: [""]
+  resources:
+    - pods/exec
+  verbs:
+    - create
