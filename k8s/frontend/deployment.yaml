@@ -19,8 +19,8 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: react-frontend:v2
-        imagePullPolicy: Never
+        image: techwithdiwana/frontend:test
+        imagePullPolicy: IfNotPresent
 
         ports:
         - containerPort: 80

@@ -5,31 +5,36 @@ metadata:
   name: jenkins-agent-role
 
 rules:
-- apiGroups: [""]
+- apiGroups:
+  - ""
   resources:
-    - pods
-    - services
-    - configmaps
-    - secrets
-    - namespaces
+  - pods
+  - services
+  - configmaps
+  - secrets
+  - namespaces
   verbs:
-    - get
-    - list
-    - watch
+  - get
+  - list
+  - watch
 
-- apiGroups: ["apps"]
+- apiGroups:
+  - apps
   resources:
-    - deployments
-    - statefulsets
+  - deployments
+  - statefulsets
   verbs:
-    - get
-    - list
-    - watch
-    - patch
-    - update
+  - get
+  - list
+  - watch
+  - create
+  - patch
+  - update
+  - delete
 
-- apiGroups: [""]
+- apiGroups:
+  - ""
   resources:
-    - pods/exec
+  - pods/exec
   verbs:
-    - create
+  - create
