@@ -1,8 +1,13 @@
+from app.routes.auth import router as auth_router
 from fastapi import FastAPI
+from app.database import Base, engine
+from app.models.user import User
 import os
 import pymysql
 
 app = FastAPI()
+app.include_router(auth_router, prefix="/api/auth", tags=["Authentication"])
+Base.metadata.create_all(bind=engine)
 
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = int(os.getenv("DB_PORT", "3306"))
