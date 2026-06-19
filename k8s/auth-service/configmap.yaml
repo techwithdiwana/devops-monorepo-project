@@ -5,9 +5,7 @@ metadata:
   name: auth-config
 
 data:
-  DB_HOST: mysql-service
+  DB_HOST: mysql-service.default.svc.cluster.local
   DB_PORT: "3306"
   DB_NAME: devopsdb
-  DB_USER: auth-user
-  DB_PASSWORD: auth-password
   LOG_LEVEL: INFO
