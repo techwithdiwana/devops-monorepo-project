@@ -1,0 +1,246 @@
+---
+# Source: auth-service/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+
+metadata:
+  name: auth-secret
+
+type: Opaque
+
+stringData:
+  DB_USER: "root"
+  DB_PASSWORD: "Root@123"
+---
+# Source: auth-service/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: auth-config
+
+data:
+  DB_HOST: "mysql-service"
+  DB_PORT: "3306"
+  DB_NAME: "devopsdb"
+  LOG_LEVEL: "INFO"
+---
+# Source: auth-service/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  labels:
+    helm.sh/chart: auth-service-0.1.0
+    app.kubernetes.io/name: auth-service
+    app.kubernetes.io/instance: auth-service
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: auth-service
+    app.kubernetes.io/instance: auth-service
+---
+# Source: auth-service/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  labels:
+    helm.sh/chart: auth-service-0.1.0
+    app.kubernetes.io/name: auth-service
+    app.kubernetes.io/instance: auth-service
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: auth-service
+      app.kubernetes.io/instance: auth-service
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: auth-service-0.1.0
+        app.kubernetes.io/name: auth-service
+        app.kubernetes.io/instance: auth-service
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      securityContext:
+        Capabilities:
+          APIVersions:
+          - v1
+          - admissionregistration.k8s.io/v1
+          - admissionregistration.k8s.io/v1alpha1
+          - admissionregistration.k8s.io/v1beta1
+          - internal.apiserver.k8s.io/v1alpha1
+          - apps/v1
+          - apps/v1beta1
+          - apps/v1beta2
+          - authentication.k8s.io/v1
+          - authentication.k8s.io/v1alpha1
+          - authentication.k8s.io/v1beta1
+          - authorization.k8s.io/v1
+          - authorization.k8s.io/v1beta1
+          - autoscaling/v1
+          - autoscaling/v2
+          - autoscaling/v2beta1
+          - autoscaling/v2beta2
+          - batch/v1
+          - batch/v1beta1
+          - certificates.k8s.io/v1
+          - certificates.k8s.io/v1beta1
+          - certificates.k8s.io/v1alpha1
+          - coordination.k8s.io/v1alpha2
+          - coordination.k8s.io/v1beta1
+          - coordination.k8s.io/v1
+          - discovery.k8s.io/v1
+          - discovery.k8s.io/v1beta1
+          - events.k8s.io/v1
+          - events.k8s.io/v1beta1
+          - extensions/v1beta1
+          - flowcontrol.apiserver.k8s.io/v1
+          - flowcontrol.apiserver.k8s.io/v1beta1
+          - flowcontrol.apiserver.k8s.io/v1beta2
+          - flowcontrol.apiserver.k8s.io/v1beta3
+          - networking.k8s.io/v1
+          - networking.k8s.io/v1beta1
+          - node.k8s.io/v1
+          - node.k8s.io/v1alpha1
+          - node.k8s.io/v1beta1
+          - policy/v1
+          - policy/v1beta1
+          - rbac.authorization.k8s.io/v1
+          - rbac.authorization.k8s.io/v1beta1
+          - rbac.authorization.k8s.io/v1alpha1
+          - resource.k8s.io/v1
+          - resource.k8s.io/v1beta2
+          - resource.k8s.io/v1beta1
+          - resource.k8s.io/v1alpha3
+          - scheduling.k8s.io/v1alpha1
+          - scheduling.k8s.io/v1beta1
+          - scheduling.k8s.io/v1
+          - storage.k8s.io/v1beta1
+          - storage.k8s.io/v1
+          - storage.k8s.io/v1alpha1
+          - storagemigration.k8s.io/v1beta1
+          - apiextensions.k8s.io/v1beta1
+          - apiextensions.k8s.io/v1
+          HelmVersion:
+            git_commit: 05fa37973dc9e42b76e1d2883494c87174b6074f
+            git_tree_state: clean
+            go_version: go1.25.9
+            kube_client_version: v1.35
+            version: v4.1.4
+          KubeVersion:
+            Major: "1"
+            Minor: "35"
+            Version: v1.35.0
+        Chart:
+          APIVersion: v2
+          Annotations: null
+          AppVersion: 1.16.0
+          Condition: ""
+          Dependencies: []
+          Deprecated: false
+          Description: A Helm chart for Kubernetes
+          Home: ""
+          Icon: ""
+          IsRoot: true
+          Keywords: []
+          KubeVersion: ""
+          Maintainers: []
+          Name: auth-service
+          Sources: []
+          Tags: ""
+          Type: application
+          Version: 0.1.0
+        Files:
+          .helmignore: IyBQYXR0ZXJucyB0byBpZ25vcmUgd2hlbiBidWlsZGluZyBwYWNrYWdlcy4KIyBUaGlzIHN1cHBvcnRzIHNoZWxsIGdsb2IgbWF0Y2hpbmcsIHJlbGF0aXZlIHBhdGggbWF0Y2hpbmcsIGFuZAojIG5lZ2F0aW9uIChwcmVmaXhlZCB3aXRoICEpLiBPbmx5IG9uZSBwYXR0ZXJuIHBlciBsaW5lLgouRFNfU3RvcmUKIyBDb21tb24gVkNTIGRpcnMKLmdpdC8KLmdpdGlnbm9yZQouYnpyLwouYnpyaWdub3JlCi5oZy8KLmhnaWdub3JlCi5zdm4vCiMgQ29tbW9uIGJhY2t1cCBmaWxlcwoqLnN3cAoqLmJhawoqLnRtcAoqLm9yaWcKKn4KIyBWYXJpb3VzIElERXMKLnByb2plY3QKLmlkZWEvCioudG1wcm9qCi52c2NvZGUvCg==
+        Release:
+          IsInstall: true
+          IsUpgrade: false
+          Name: auth-service
+          Namespace: default
+          Revision: 1
+          Service: Helm
+        Subcharts: {}
+        Template:
+          BasePath: auth-service/templates
+          Name: auth-service/templates/deployment.yaml
+        Values:
+          autoscaling:
+            enabled: false
+          config:
+            dbHost: mysql-service
+            dbName: devopsdb
+            dbPort: "3306"
+            logLevel: INFO
+          image:
+            pullPolicy: IfNotPresent
+            repository: techwithdiwana/auth-service
+            tag: v4
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+          replicaCount: 2
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          secret:
+            dbPassword: Root@123
+            dbUser: root
+          service:
+            port: 8000
+            type: ClusterIP
+          serviceAccount:
+            annotations: {}
+            automount: false
+            create: false
+            name: ""
+      
+      containers:
+        - name: auth-service
+          image: "techwithdiwana/auth-service:v4"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          envFrom:
+             - configMapRef:
+                   name: auth-config
+
+             - secretRef:
+                  name: auth-secret
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+          resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi

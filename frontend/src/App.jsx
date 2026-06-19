@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 function App() {
   const [status, setStatus] = useState("Loading...");
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
-    fetch("http://api.frontend.local/health")
+    fetch(`${API_URL}/health`)
       .then((res) => res.json())
       .then((data) => {
         setStatus(data.status);
