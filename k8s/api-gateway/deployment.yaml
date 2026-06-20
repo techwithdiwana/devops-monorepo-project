@@ -20,9 +20,9 @@ spec:
       containers:
       - name: api-gateway
 
-        image: api-gateway:v3
+        image: techwithdiwana/api-gateway:v3
 
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
 
         ports:
         - containerPort: 3000

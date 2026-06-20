@@ -1,0 +1,59 @@
+replicaCount: 2
+
+image:
+  repository: techwithdiwana/api-gateway
+  tag: "v3"
+  pullPolicy: IfNotPresent
+
+configMap:
+  name: api-gateway-config
+
+config:
+  authServiceUrl: "http://auth-service:8000"
+  logLevel: "INFO"
+
+secret:
+  apiKey: "TechWithDiwana123"
+
+service:
+  type: ClusterIP
+  port: 3000
+
+ingress:
+  enabled: true
+
+  className: nginx
+
+  hosts:
+    - host: api-helm.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+
+  initialDelaySeconds: 15
+  periodSeconds: 20
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+autoscaling:
+  enabled: false
