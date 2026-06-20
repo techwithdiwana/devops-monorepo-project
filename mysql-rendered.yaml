@@ -1,0 +1,102 @@
+---
+# Source: mysql/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+
+metadata:
+  name: mysql-secret
+
+type: Opaque
+
+stringData:
+  MYSQL_ROOT_PASSWORD: "Root@123"
+---
+# Source: mysql/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: mysql-config
+
+data:
+  MYSQL_DATABASE: "devopsdb"
+---
+# Source: mysql/templates/service.yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: mysql-service
+
+spec:
+  clusterIP: None
+
+  selector:
+    app: mysql
+
+  ports:
+    - port: 3306
+      targetPort: 3306
+---
+# Source: mysql/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+
+metadata:
+  name: mysql
+
+spec:
+  serviceName: mysql-service
+
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: mysql
+
+  template:
+    metadata:
+      labels:
+        app: mysql
+
+    spec:
+      containers:
+      - name: mysql
+
+        image: "mysql:8.0"
+
+        imagePullPolicy: IfNotPresent
+
+        ports:
+        - containerPort: 3306
+
+        envFrom:
+        - configMapRef:
+            name: mysql-config
+
+        - secretRef:
+            name: mysql-secret
+
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-storage
+
+    spec:
+      accessModes:
+      - ReadWriteOnce
+
+      resources:
+        requests:
+          storage: 5Gi
