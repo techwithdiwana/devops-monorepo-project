@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: {{ .Values.configMap.name }}
+
+data:
+  AUTH_SERVICE_URL: {{ .Values.config.authServiceUrl | quote }}
+  LOG_LEVEL: {{ .Values.config.logLevel | quote }}
