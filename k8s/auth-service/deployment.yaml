@@ -20,9 +20,9 @@ spec:
       containers:
       - name: auth-service
 
-        image: auth-service:v4
+        image: techwithdiwana/auth-service:v4
 
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
 
         ports:
         - containerPort: 8000
