@@ -1,18 +1,24 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
+from urllib.parse import quote_plus
 import os
 
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT", "3306")
 DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
+
+# Special characters (@, #, $, %, etc.) ko encode karega
+DB_PASSWORD = quote_plus(os.getenv("DB_PASSWORD", ""))
 
 DATABASE_URL = (
     f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}"
     f"@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 )
+
+print(f"Connecting to MySQL Host: {DB_HOST}")
+print(f"Database Name: {DB_NAME}")
 
 engine = create_engine(DATABASE_URL)
 
