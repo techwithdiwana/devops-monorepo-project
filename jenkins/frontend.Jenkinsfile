@@ -5,8 +5,13 @@ agent {
 }
 
 environment {
+
     DOCKER_IMAGE = 'techwithdiwana/frontend'
-    IMAGE_TAG = 'test'
+    IMAGE_TAG    = "${BUILD_NUMBER}"
+
+    HELM_RELEASE   = 'frontend'
+    HELM_NAMESPACE = 'helm-test'
+    HELM_CHART     = 'helm/frontend'
 }
 
 stages {
@@ -21,7 +26,7 @@ stages {
         }
     }
 
-    stage('Frontend Build') {
+    stage('Build Frontend') {
 
         steps {
 
@@ -36,43 +41,7 @@ stages {
         }
     }
 
-    stage('Archive Frontend Artifact') {
-
-        steps {
-
-            archiveArtifacts artifacts: 'frontend/dist/**'
-        }
-    }
-
-    stage('Auth Service Validation') {
-
-        steps {
-
-            container('python') {
-
-                dir('auth-service') {
-
-                    sh 'python --version'
-                    sh 'pip install -r requirements.txt'
-                }
-            }
-        }
-    }
-
-    stage('Verify Dockerfile') {
-
-        steps {
-
-            container('kaniko') {
-
-                sh 'echo WORKSPACE=$WORKSPACE'
-                sh 'pwd'
-                sh 'ls -la $WORKSPACE/frontend'
-            }
-        }
-    }
-
-    stage('Build & Push Frontend Image') {
+    stage('Build & Push Docker Image') {
 
         steps {
 
@@ -111,20 +80,49 @@ stages {
         }
     }
 
-    stage('Deploy Frontend') {
+    stage('Helm Lint') {
 
         steps {
 
-            container('kubectl') {
+            container('helm') {
 
                 sh '''
-                kubectl apply -f k8s/frontend/deployment.yaml
+                helm lint ${HELM_CHART}
+                '''
+            }
+        }
+    }
 
-                kubectl rollout status deployment/frontend --timeout=120s
+    stage('Helm Deploy') {
 
-                kubectl get deployment frontend
+        steps {
 
-                kubectl get pods -l app=frontend
+            container('helm') {
+
+                sh '''
+                helm upgrade --install ${HELM_RELEASE} ${HELM_CHART} \
+                -n ${HELM_NAMESPACE} \
+                --set image.repository=${DOCKER_IMAGE} \
+                --set image.tag=${IMAGE_TAG}
+                '''
+            }
+        }
+    }
+
+    stage('Verify Rollout') {
+
+        steps {
+
+            container('helm') {
+
+                sh '''
+                kubectl rollout status deployment/frontend \
+                -n ${HELM_NAMESPACE} \
+                --timeout=300s
+
+                kubectl get pods -n ${HELM_NAMESPACE}
+
+                kubectl get svc -n ${HELM_NAMESPACE}
                 '''
             }
         }
@@ -134,11 +132,14 @@ stages {
 post {
 
     success {
-        echo 'Frontend image successfully built, pushed and deployed'
+
+        echo "Frontend deployment successful"
+        echo "Docker Image: ${DOCKER_IMAGE}:${IMAGE_TAG}"
     }
 
     failure {
-        echo 'Pipeline failed'
+
+        echo "Frontend deployment failed"
     }
 }
 
