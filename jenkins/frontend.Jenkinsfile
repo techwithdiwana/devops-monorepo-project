@@ -6,8 +6,8 @@ agent {
 
 environment {
 
-    DOCKER_IMAGE = 'techwithdiwana/frontend'
-    IMAGE_TAG    = "${BUILD_NUMBER}"
+    DOCKER_IMAGE   = 'techwithdiwana/frontend'
+    IMAGE_TAG      = "${BUILD_NUMBER}"
 
     HELM_RELEASE   = 'frontend'
     HELM_NAMESPACE = 'helm-test'
@@ -34,8 +34,10 @@ stages {
 
                 dir('frontend') {
 
-                    sh 'npm install'
-                    sh 'npm run build'
+                    sh '''
+                    npm install
+                    npm run build
+                    '''
                 }
             }
         }
@@ -56,21 +58,22 @@ stages {
                 ]) {
 
                     sh '''
+                    set -ex
+
+                    echo "WORKSPACE=$WORKSPACE"
+
+                    ls -la $WORKSPACE/frontend
+
                     mkdir -p /kaniko/.docker
 
                     AUTH=$(echo -n "$DOCKER_USER:$DOCKER_PASS" | base64 | tr -d '\\n')
 
-                    cat > /kaniko/.docker/config.json <<EOF
-                    {
-                      "auths": {
-                        "https://index.docker.io/v1/": {
-                          "auth": "$AUTH"
-                        }
-                      }
-                    }
-                    EOF
+                    echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$AUTH\"}}}" > /kaniko/.docker/config.json
+
+                    cat /kaniko/.docker/config.json
 
                     /kaniko/executor \
+                      --verbosity=debug \
                       --context=$WORKSPACE/frontend \
                       --dockerfile=$WORKSPACE/frontend/Dockerfile \
                       --destination=${DOCKER_IMAGE}:${IMAGE_TAG}
@@ -133,13 +136,13 @@ post {
 
     success {
 
-        echo "Frontend deployment successful"
-        echo "Docker Image: ${DOCKER_IMAGE}:${IMAGE_TAG}"
+        echo "Deployment Successful"
+        echo "Image: ${DOCKER_IMAGE}:${IMAGE_TAG}"
     }
 
     failure {
 
-        echo "Frontend deployment failed"
+        echo "Deployment Failed"
     }
 }
 
