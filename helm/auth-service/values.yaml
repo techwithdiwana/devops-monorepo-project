@@ -10,9 +10,9 @@ service:
   port: 8000
 
 config:
-  dbhost: mysql-service.helm-mysql-test.svc.cluster.local
-  dbport: "3306"
-  dbname: devopsdb
+  dbHost: mysql-service.helm-mysql-test.svc.cluster.local
+  dbPort: "3306"
+  dbName: devopsdb
   logLevel: INFO
 
 secret:
