@@ -43,11 +43,28 @@ stages {
         }
     }
 
-mkdir -p /kaniko/.docker
+stage('Build & Push Docker Image') {
 
-AUTH=$(echo -n "$DOCKER_USER:$DOCKER_PASS" | base64 | tr -d '\n')
+    steps {
 
-cat > /kaniko/.docker/config.json <<EOF
+        container('kaniko') {
+
+            withCredentials([
+                usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )
+            ]) {
+
+                sh '''
+                set -ex
+
+                mkdir -p /kaniko/.docker
+
+                AUTH=$(echo -n "$DOCKER_USER:$DOCKER_PASS" | base64 | tr -d '\\n')
+
+                cat > /kaniko/.docker/config.json <<EOF
 {
   "auths": {
     "https://index.docker.io/v1/": {
@@ -57,27 +74,19 @@ cat > /kaniko/.docker/config.json <<EOF
 }
 EOF
 
-echo "===== Docker Config ====="
-cat /kaniko/.docker/config.json
+                echo "===== Docker Config ====="
+                cat /kaniko/.docker/config.json
 
-/kaniko/executor \
-  --verbosity=debug \
-  --context=$WORKSPACE/frontend \
-  --dockerfile=$WORKSPACE/frontend/Dockerfile \
-  --destination=${DOCKER_IMAGE}:${IMAGE_TAG}
-
-    stage('Helm Lint') {
-
-        steps {
-
-            container('helm') {
-
-                sh '''
-                helm lint ${HELM_CHART}
+                /kaniko/executor \
+                  --verbosity=debug \
+                  --context=$WORKSPACE/frontend \
+                  --dockerfile=$WORKSPACE/frontend/Dockerfile \
+                  --destination=${DOCKER_IMAGE}:${IMAGE_TAG}
                 '''
             }
         }
     }
+}
 
     stage('Helm Deploy') {
 
