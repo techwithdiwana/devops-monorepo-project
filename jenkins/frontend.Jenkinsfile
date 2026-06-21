@@ -43,7 +43,7 @@ stages {
         }
     }
 
-    mkdir -p /kaniko/.docker
+mkdir -p /kaniko/.docker
 
 AUTH=$(echo -n "$DOCKER_USER:$DOCKER_PASS" | base64 | tr -d '\n')
 
