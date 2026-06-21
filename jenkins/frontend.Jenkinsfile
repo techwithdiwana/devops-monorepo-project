@@ -1,6 +1,5 @@
 pipeline {
 
-```
 agent {
     label 'k8s-agent'
 }
@@ -142,6 +141,5 @@ post {
         echo 'Pipeline failed'
     }
 }
-```
 
 }

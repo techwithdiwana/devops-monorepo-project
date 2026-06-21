@@ -13,16 +13,24 @@ rules:
   - configmaps
   - secrets
   - namespaces
+  - serviceaccounts
+  - ingresses
   verbs:
   - get
   - list
   - watch
+  - create
+  - update
+  - patch
+  - delete
 
 - apiGroups:
   - apps
+  - networking.k8s.io
   resources:
   - deployments
   - statefulsets
+  - ingresses
   verbs:
   - get
   - list
