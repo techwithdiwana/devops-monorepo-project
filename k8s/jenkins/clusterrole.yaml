@@ -16,6 +16,7 @@ rules:
   - namespaces
   - serviceaccounts
   - ingresses
+  - persistentvolumeclaims
   verbs:
   - get
   - list
