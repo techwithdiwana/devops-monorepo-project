@@ -12,6 +12,21 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+import os
+
+db_host = os.getenv("DB_HOST")
+db_port = os.getenv("DB_PORT", "3306")
+db_name = os.getenv("DB_NAME")
+db_user = os.getenv("DB_USER")
+db_password = os.getenv("DB_PASSWORD")
+
+DATABASE_URL = (
+    f"mysql+pymysql://{db_user}:{db_password}"
+    f"@{db_host}:{db_port}/{db_name}"
+)
+
+config.set_main_option("sqlalchemy.url", DATABASE_URL)
+
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
