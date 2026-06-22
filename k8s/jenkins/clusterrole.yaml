@@ -17,6 +17,7 @@ rules:
   - serviceaccounts
   - ingresses
   - persistentvolumeclaims
+  - persistentvolumes
   verbs:
   - get
   - list
