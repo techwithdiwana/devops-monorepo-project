@@ -1,0 +1,46 @@
+name: Needs Demo
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Build Stage
+        run: |
+          echo "Building Application..."
+          sleep 10
+          echo "Build Completed"
+
+  test:
+
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Test Stage
+        run: |
+          echo "Running Tests..."
+          sleep 10
+          echo "Tests Passed"
+
+  deploy:
+
+    needs: test
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Deploy Stage
+        run: |
+          echo "Deploying Application..."
+          sleep 10
+          echo "Deployment Successful"
