@@ -18,7 +18,9 @@ db_host = os.getenv("DB_HOST")
 db_port = os.getenv("DB_PORT", "3306")
 db_name = os.getenv("DB_NAME")
 db_user = os.getenv("DB_USER")
-db_password = os.getenv("DB_PASSWORD")
+from urllib.parse import quote_plus
+
+db_password = quote_plus(os.getenv("DB_PASSWORD", ""))
 
 DATABASE_URL = (
     f"mysql+pymysql://{db_user}:{db_password}"
