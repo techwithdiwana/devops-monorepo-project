@@ -1,0 +1,44 @@
+name: Auth Service CI
+
+on:
+  push:
+    branches:
+      - develop
+
+    paths:
+      - 'auth-service/**'
+
+  workflow_dispatch:
+
+jobs:
+
+  build-and-test:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: auth-service
+
+    steps:
+
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+
+        with:
+          python-version: "3.12"
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Verify Python Version
+        run: |
+          python --version
+
+      - name: Verify Installed Packages
+        run: |
+          pip list
