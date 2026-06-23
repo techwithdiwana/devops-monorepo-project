@@ -20,7 +20,7 @@ db_name = os.getenv("DB_NAME")
 db_user = os.getenv("DB_USER")
 from urllib.parse import quote_plus
 
-db_password = quote_plus(os.getenv("DB_PASSWORD", ""))
+db_password = quote_plus(os.getenv("DB_PASSWORD", "")).replace("%", "%%")
 
 DATABASE_URL = (
     f"mysql+pymysql://{db_user}:{db_password}"
