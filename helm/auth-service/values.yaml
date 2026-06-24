@@ -2,7 +2,7 @@ replicaCount: 2
 
 image:
   repository: techwithdiwana/auth-service
-  tag: v4
+  tag: 3
   pullPolicy: IfNotPresent
 
 service:
