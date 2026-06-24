@@ -2,8 +2,8 @@ replicaCount: 2
 
 image:
   repository: techwithdiwana/auth-service
-  tag: 3
-  pullPolicy: IfNotPresent
+  tag: 4
+  pullPolicy: Always
 
 service:
   type: ClusterIP
