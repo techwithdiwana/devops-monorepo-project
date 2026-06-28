@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - develop
-
     paths:
       - "api-gateway/**"
 
@@ -16,9 +15,7 @@ permissions:
 jobs:
 
   prepare:
-
     name: Prepare Environment
-
     runs-on: ubuntu-latest
 
     defaults:
@@ -26,32 +23,27 @@ jobs:
         working-directory: api-gateway
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
-
         with:
           node-version: "22"
           cache: "npm"
           cache-dependency-path: api-gateway/package-lock.json
 
       - name: Install Dependencies
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Verify Node Version
         run: |
           node --version
           npm --version
-lint:
 
+  lint:
     name: Code Quality Check
-
     runs-on: ubuntu-latest
-
     needs: prepare
 
     defaults:
@@ -59,31 +51,25 @@ lint:
         working-directory: api-gateway
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
-
         with:
           node-version: "22"
           cache: "npm"
           cache-dependency-path: api-gateway/package-lock.json
 
       - name: Install Dependencies
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Run ESLint
-        run: |
-          npm run lint
-test:
+        run: npm run lint
 
+  test:
     name: Unit Tests
-
     runs-on: ubuntu-latest
-
     needs: lint
 
     defaults:
@@ -91,65 +77,46 @@ test:
         working-directory: api-gateway
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
-
         with:
           node-version: "22"
           cache: "npm"
           cache-dependency-path: api-gateway/package-lock.json
 
       - name: Install Dependencies
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Run Unit Tests
-        run: |
-          npm test
+        run: npm test
 
-trivy-fs:
-
+  trivy-fs:
     name: Trivy Filesystem Scan
-
     runs-on: ubuntu-latest
-
     needs: test
 
-    defaults:
-      run:
-        working-directory: api-gateway
-
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Run Trivy Filesystem Scan
         uses: aquasecurity/trivy-action@0.33.1
-
         with:
           scan-type: "fs"
           scan-ref: "./api-gateway"
           severity: "CRITICAL,HIGH"
-          exit-code: "1"
           ignore-unfixed: true
+          exit-code: "1"
+
   docker:
-
     name: Build, Scan & Push Docker Image
-
     runs-on: ubuntu-latest
-
     needs: trivy-fs
 
-    permissions:
-      contents: read
-
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -158,86 +125,58 @@ trivy-fs:
 
       - name: Login To DockerHub
         uses: docker/login-action@v3
-
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Build Docker Image
-
         run: |
-
           docker build \
             -t techwithdiwana/api-gateway:${{ github.run_number }} \
             -t techwithdiwana/api-gateway:latest \
             ./api-gateway
 
       - name: Scan Docker Image
-
         uses: aquasecurity/trivy-action@0.33.1
-
         with:
-          image-ref: techwithdiwana/api-gateway:${{ github.run_number }}
-          format: table
-          severity: CRITICAL,HIGH
+          image-ref: "techwithdiwana/api-gateway:${{ github.run_number }}"
+          format: "table"
+          severity: "CRITICAL,HIGH"
           ignore-unfixed: true
           exit-code: "1"
 
       - name: Push Docker Images
-
         run: |
-
           docker push techwithdiwana/api-gateway:${{ github.run_number }}
-
           docker push techwithdiwana/api-gateway:latest
+
   update-helm:
-
     name: Update Helm Chart
-
     runs-on: ubuntu-latest
-
     needs: docker
 
-    permissions:
-      contents: write
-
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Update Image Tag
-
         run: |
-
-          sed -i "s/tag:.*/tag: ${GITHUB_RUN_NUMBER}/" \
-          helm/api-gateway/values.yaml
+          sed -i "s/tag:.*/tag: ${GITHUB_RUN_NUMBER}/" helm/api-gateway/values.yaml
 
       - name: Configure Git
-
         run: |
-
           git config user.name "github-actions"
-
           git config user.email "github-actions@github.com"
 
-      - name: Commit Changes
-
+      - name: Pull Latest Changes
         run: |
-
-          git add helm/api-gateway/values.yaml
-
-          git commit -m "ci: update api-gateway image to ${GITHUB_RUN_NUMBER}" \
-          || echo "No changes to commit"
-
-      - name: Rebase With Latest Changes
-
-        run: |
-
           git pull --rebase origin develop
 
-      - name: Push Changes
-
+      - name: Commit Changes
         run: |
+          git add helm/api-gateway/values.yaml
+          git commit -m "ci: update api-gateway image to ${GITHUB_RUN_NUMBER}" || echo "Nothing to commit"
 
-          git push origin develop          
+      - name: Push Changes
+        run: |
+          git push origin develop
