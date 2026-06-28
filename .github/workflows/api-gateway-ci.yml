@@ -103,7 +103,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Trivy Filesystem Scan
-        uses: aquasecurity/trivy-action@0.33.1
+         uses: aquasecurity/trivy-action@master
         with:
           scan-type: "fs"
           scan-ref: "./api-gateway"
@@ -137,7 +137,7 @@ jobs:
             ./api-gateway
 
       - name: Scan Docker Image
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: "techwithdiwana/api-gateway:${{ github.run_number }}"
           format: "table"
